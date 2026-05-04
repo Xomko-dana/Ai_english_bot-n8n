@@ -20,7 +20,7 @@ This project is an AI chatbot built with n8n automation.
 
 ## 📂 How to use
 
-1. Import `workflow.json` into n8n
+1. Import `botforProfiEnglish.json` into n8n
 2. Add your API keys
 3. Activate workflow
 
@@ -28,6 +28,4 @@ This project is an AI chatbot built with n8n automation.
 
 Automates communication with students and helps convert visitors into clients.
 
-## 🔗 Demo
 
-(Add your bot link here)
