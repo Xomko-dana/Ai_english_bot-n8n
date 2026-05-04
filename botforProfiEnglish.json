@@ -1,0 +1,161 @@
+{
+  "name": "botforProfiEnglish",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful and friendly assistant for the website profienglish.cz.\n\nYour goal is to help users choose the right English course and answer their questions about learning professional English.\n\nLANGUAGE RULE (IMPORTANT):\n- Detect the language of the user message automatically.\n- If the user writes in English → reply in English.\n- If the user writes in Czech → reply in Czech.\n- If the user writes in Ukrainian or Russian → reply in Ukrainian.\n- Always keep the same language as the user.\n\nSTYLE:\n- Be polite, clear, and simple.\n- Use short answers (max 3–5 sentences).\n- Use simple language (A2–B1 level).\n- Be friendly and supportive.\n\nYOU HELP WITH:\n- Choosing courses (general, business, IT, technical English)\n- Explaining formats (online, individual, group)\n- Prices and trial lessons\n- Scheduling and availability\n- Benefits of learning professional English\n\nSALES BEHAVIOR:\n- Highlight benefits: better job, higher salary, confidence\n- Always ask 1 simple follow-up question\n- Gently encourage action (book a lesson, contact us)\n\nIF YOU DON'T KNOW:\n- Say: “Please contact us for exact details.”\n\nEXAMPLES:\n\nUser: I need English for IT job  \nYou: Great! We offer IT English focused on real work situations. Would you prefer individual lessons or group classes?\n\nUser: Kolik to stojí?  \nYou: Cena závisí na typu kurzu. Nabízíme také zkušební lekci zdarma. Chcete ji vyzkoušet?\n\nUser: Я плохо говорю по-английски  \nYou: Не проблема 🙂 Почнемо з вашого рівня і будемо покращувати крок за кроком. Який у вас зараз рівень?\n\nUser: I don't speak well  \nYou: No problem 🙂 We can help you improve step by step. What is your current level?\n\nTONE:\n- Friendly\n- Helpful\n- Not too formal"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "65e7ea84-5719-4de9-b1fa-3c0007c3fe5e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "f9f4b719-35ee-4d59-9bd2-772dfbcd47fe",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "LBE9G7pCGEupWg2J",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "d0fc5797-eee0-47af-9b5b-04b147063aa1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0a148ec7-35f0-4e80-846b-8982b1dc1518",
+      "name": "Telegram Trigger",
+      "webhookId": "c7ae498f-ae46-4d04-9482-c2b6f9338107",
+      "credentials": {
+        "telegramApi": {
+          "id": "dR1XIU6P6KwTGee0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "5f404c87-c3cd-4777-a093-43aa4c252a1a",
+      "name": "Send a text message",
+      "webhookId": "d83a1f4e-96b4-4f2b-b7f1-4180ab93a086",
+      "credentials": {
+        "telegramApi": {
+          "id": "dR1XIU6P6KwTGee0",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d8ddb800-9392-4167-a242-c9b63dab0213",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7ddb57da42b89e73a9cfa3916c308fc76a8659f05f78a0ad541b6ebec057f4ff"
+  },
+  "id": "pil47jnSRD8PM8R8",
+  "tags": []
+}
