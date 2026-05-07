@@ -1,4 +1,4 @@
-# Ai_english_bot-n8n
+# Ai_english_Assistant n8n
 AI chatbot for English courses using n8n and Telegram
 
 # 🤖 AI English Course Bot (n8n)
